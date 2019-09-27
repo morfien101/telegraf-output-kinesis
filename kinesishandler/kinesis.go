@@ -128,11 +128,11 @@ var sampleConfig = `
   debug = false
 `
 
-func (k *KinesisOutput) SampleConfig() string {
+func SampleConfig() string {
 	return sampleConfig
 }
 
-func (k *KinesisOutput) Description() string {
+func Description() string {
 	return "Configuration for the AWS Kinesis output."
 }
 
