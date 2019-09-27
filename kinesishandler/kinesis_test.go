@@ -69,19 +69,6 @@ func TestPartitionKey(t *testing.T) {
 	u, err := uuid.FromString(partitionKey)
 	assert.Nil(err, "Issue parsing UUID")
 	assert.Equal(byte(4), u.Version(), "PartitionKey should be UUIDv4")
-
-	k = KinesisOutput{
-		PartitionKey: "-",
-	}
-	assert.Equal("-", k.getPartitionKey(testPoint), "PartitionKey should be '-'")
-
-	k = KinesisOutput{
-		RandomPartitionKey: true,
-	}
-	partitionKey = k.getPartitionKey(testPoint)
-	u, err = uuid.FromString(partitionKey)
-	assert.Nil(err, "Issue parsing UUID")
-	assert.Equal(byte(4), u.Version(), "PartitionKey should be UUIDv4")
 }
 
 func TestConfigDecoding(t *testing.T) {

@@ -13,3 +13,4 @@
 
 # Dev files
 kinesis_output.toml
+testing/telegraf

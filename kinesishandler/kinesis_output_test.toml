@@ -23,12 +23,6 @@ region = "ap-southeast-2"
 
   ## Kinesis StreamName must exist prior to starting telegraf.
   streamname = "StreamName"
-  ## DEPRECATED: PartitionKey as used for sharding data.
-  partitionkey = "PartitionKey"
-  ## DEPRECATED: If set the paritionKey will be a random UUID on every put.
-  ## This allows for scaling across multiple shards in a stream.
-  ## This will cause issues with ordering.
-  use_random_partitionkey = false
   ## The partition key can be calculated using one of several methods:
   ##
   ## Use a static value for all writes:
@@ -50,13 +44,6 @@ region = "ap-southeast-2"
   #    method = "tag"
   #    key = "host"
   #    default = "mykey"
-
-
-  ## Data format to output.
-  ## Each data format has its own unique set of configuration options, read
-  ## more about them here:
-  ## https://github.com/influxdata/telegraf/blob/master/docs/DATA_FORMATS_OUTPUT.md
-	data_format = "influx"
 	
 	# Aggregate metrics into payloads that will fit into the Kinesis records. This
 	# is designed to save money by making more efficient use of Kinesis.
@@ -73,3 +60,11 @@ region = "ap-southeast-2"
 
   ## debug will show upstream aws messages.
   debug = false
+  [partition]
+      method = "random"
+  [formatting]
+    ## Data format to output.
+    ## Each data format has its own unique set of configuration options, read
+    ## more about them here:
+    ## https://github.com/influxdata/telegraf/blob/master/docs/DATA_FORMATS_OUTPUT.md
+    data_format = "json"
