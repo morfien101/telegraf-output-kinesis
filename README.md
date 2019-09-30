@@ -1,7 +1,20 @@
 # Amazon Kinesis Output for Telegraf
 
-This is an experimental plugin that is still in the early stages of development. It will batch up all of the Points
-in one Put request to Kinesis. This should save the number of API requests by a considerable level.
+This is plugin makes use of the Telegraf [Output Exec](https://github.com/influxdata/telegraf/tree/master/plugins/outputs/exec) plugin. It will batch up all of the Points
+in as few Put request to Kinesis. Data can also be compressed to further reduce the size. This should save the number of API requests by a considerable level.
+
+It expects that the configuration for the output ship data in JSON. Here is an example configuration of the Exec Output.
+
+```toml
+[[outputs.exec]]
+  command = ["./telegraf_kinesis_output"]
+  data_format = "json"
+  json_timestamp_units = "1ms"
+```
+
+We have worked hard to keep the code base and configuration as similar to telegraf as we can. We also try to support the same features as telegraf, such as data formatting for output aka Serializers and Encoders.
+
+Encoders are extracted from telegraf so may have a when being introduced into this plugin. This is due to the encoders being an internal package in telegraf.
 
 ## About Kinesis
 
@@ -57,7 +70,7 @@ For this output plugin to function correctly the following variables must be con
 
 The region is the Amazon region that you wish to connect to. Examples include but are not limited to
 
-* us-west-1
+* eu-west-1
 * us-west-2
 * us-east-1
 * ap-southeast-1
@@ -68,17 +81,6 @@ The region is the Amazon region that you wish to connect to. Examples include bu
 The streamname is used by the plugin to ensure that data is sent to the correct Kinesis stream. It is important to
 note that the stream *MUST* be pre-configured for this plugin to function correctly. If the stream does not exist the
 plugin will result in telegraf exiting with an exit code of 1.
-
-### partitionkey [DEPRECATED]
-
-This is used to group data within a stream. Currently this plugin only supports a single partitionkey.
-Manually configuring different hosts, or groups of hosts with manually selected partitionkeys might be a workable
-solution to scale out.
-
-### use_random_partitionkey [DEPRECATED]
-
-When true a random UUID will be generated and used as the partitionkey when sending data to Kinesis. This allows data to evenly spread across multiple shards in the stream. Due to using a random paritionKey there can be no guarantee of ordering when consuming the data off the shards.
-If true then the partitionkey option will be ignored.
 
 ### partition
 
@@ -145,3 +147,26 @@ Snappy is much quicker and would be used if you are taking too long to compress 
 ### debug
 
 Prints debugging data into the logs.
+
+## Output Data Formatting aka Serializers
+
+There is a minor configuration file change here from telegraf. The formatting of data needs to be under its own table.
+However all options currently supported by telegraf are supported here.
+
+All output data formatting is stored under the heading `[formatting]`.
+
+See [Telegraf Serializers](https://github.com/influxdata/telegraf#serializers) for more information about the serializers.
+
+Example below
+
+```toml
+region = "eu-west-1"
+streamname = "RandyTest"
+override_shard_count = 2
+content_encoding = "gzip"
+[partition]
+  method = "random"
+# See below the table and format options.
+[formatting]
+  data_format = "json"
+```
