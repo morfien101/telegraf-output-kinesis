@@ -2,7 +2,7 @@
 
 # Set version
 VERSION_MAJOR=0
-VERSION_MINOR=1
+VERSION_MINOR=0
 VERSION_PATCH=0
 VERSION_SPECIAL=
 VERSION=""
@@ -34,6 +34,7 @@ UPDATE_VERSION=0
 TAR_FILES=0
 PUSH_VERSION=0
 TEST_RUN=0
+USE_GIT_VERSION=0
 
 while test $# -gt 0; do
   case $1 in
@@ -43,6 +44,8 @@ while test $# -gt 0; do
       echo "-l: Builds the Linux binary."
       echo "-m: Builds the Mac binary."
       echo "-t: Tar and gzip files that are compiled."
+      echo "-g: Use git tag version"
+      echo "-c: Cleans the build directory first."
       echo "-x86: Sets the builds to be 32bit."
       echo "--test: runs all tests."
       echo "--output-name=<bin name>: Sets the output binary to be what is supplied. Windows binarys will have a .exe suffix add to it."
@@ -70,6 +73,17 @@ while test $# -gt 0; do
       ;;
     -t)
       TAR_FILES=1
+      shift
+      ;;
+    -c)
+      if [ -d $OUT_DIR ]; then
+        echo "Cleaning out old $OUT_DIR"
+        rm -rf $OUT_DIR
+      fi
+      shift
+      ;;
+    -g)
+      USE_GIT_VERSION=1
       shift
       ;;
     -v)
@@ -128,12 +142,6 @@ while test $# -gt 0; do
   esac
 done
 
-# We need to set the version after all the flag are read.
-VERSION=$VERSION_MAJOR.$VERSION_MINOR.$VERSION_PATCH
-if [ "$SPECIAL" != "" ]; then
-  VERSION=$VERSION-$VERSION_SPECIAL;
-fi
-
 # Setup functions
 ensure_artifact_dir(){
   if [ ! -d $1 ]; then
@@ -181,6 +189,10 @@ build_bin() {
     msg "Binary for $goos failed to build!"
     exit 1
   fi
+}
+
+function latest-git-tag() {
+    git tag | tail -n 1 | sed 's/^v//'
 }
 
 function travis-branch-commit() {
@@ -250,7 +262,17 @@ function travis-branch-commit() {
   fi
 }
 
+if [ $USE_GIT_VERSION -eq 1 ]; then
+  VERSION=$(latest-git-tag)
+else
+  # We need to set the version after all the flag are read.
+  VERSION=$VERSION_MAJOR.$VERSION_MINOR.$VERSION_PATCH
+  if [ "$SPECIAL" != "" ]; then
+    VERSION=$VERSION-$VERSION_SPECIAL;
+  fi
 
+
+fi
 
 # Show version
 if [ $SHOW_VERSION_LONG -eq 1 ]; then

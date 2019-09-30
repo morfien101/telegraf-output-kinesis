@@ -1,0 +1,33 @@
+language: go
+install: true
+go:
+- '1.12'
+script:
+- "./build.sh -l -w -m -t -c -g"
+notifications:
+  email:
+    recipients:
+    - morfien101@gmail.com
+    on_success: change
+    on_failure: always
+env:
+  global:
+  - GO111MODULE=on
+branches:
+  only:
+  - master
+  except:
+  - "/\\+travis\\d+$/"
+before_deploy:
+- export PUBDIR=$HOME/publish
+- mkdir $PUBDIR
+- cp -v artifacts/*.tar.gz artifacts/*.zip $PUBDIR
+deploy:
+  provider: releases
+  api_key:
+    secure: OXDoWQmhZvs8IIMGsfBdBzA0g66AeV58wpZ61G4KDJNKPxGNPhi9/9JRJD8XxnKiQzNhXcCOEvslzx1wB0fUpTr7afuOTUyEcbYjVDCUWaKc1c7x0LlkhkWgXtcNnDmT6mBA2akuIcmktBvNOtjn6WqdA0oWOnAE0U3w9GaaD+ayl1J/ckKw2mqKB2OhW6MoMGXlVfJx+R1wXg1e+nEDUEkb9yhrkEnKaGXOJo2XKoc9/TzdfGGs2X6ZYVCGbvTxl1Xh2v6HRy2X6/YkVRqIMIMYR+FETFtdtRrvsg1HLsIy7LqrMNsAti3MiNqS3XC3hAK6YtdJDYguaKEnGxKOKQUhkHVCRJvFZB+7ZmTLVLcPNH/3dKilU4vOtBaaPc1y5XqBA+nC0GIOWGFCGF9gtjLEw/sihgBex2gOYxrUgQSSCLszTvgkFm/Q29jXpS2xUULnOQv6RY+nBT+vAcMPFV7L+mMo9apM0KXq+/D5TmYL/lS9Ia4e+d4FNtk05orpa1TZpEelIATh98iNTckfl8zY3jbEch8omNrdVz0RM7o5u1eqGWr+x19cWsDnaRUtLNtMbfCD7r2tV1wYRvb1QczKBuTTT+eEhakfjcZpxPuGCmcuUzGtHSZpTmEPvNnPndORl3svzhWyf81OD2XOczw/jGcP6joBcVyCPy2FxuM=
+  file: $PUBDIR/*
+  file_glob: true
+  skip_cleanup: true
+  on:
+    repo: morfien101/telegraf-output-kinesis
