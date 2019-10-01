@@ -47,6 +47,17 @@ will attempt to authenticate.
   debug = true
 ```
 
+## Using the plugin
+
+This plugin uses some flags to make it easier to use via the Exec Output plugin for Telegraf.
+
+Flag | Description
+---|---
+-f | Configuration file path
+-v | Shows the version of the application
+-sample | Displays a same configuration
+-description | Show a short description of the plugin
+
 ## Config
 
 ## AWS Configration

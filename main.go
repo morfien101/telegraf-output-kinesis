@@ -29,6 +29,7 @@ func main() {
 	flagSampleConfig := flag.Bool("sample", false, "Prints a sample configuration to the StdOut.")
 	flagDescription := flag.Bool("description", false, "Prints a sample configuration to the StdOut.")
 	flagConfigFile := flag.String("f", "kinesis_output.toml", "The location of the plugins configuration file.")
+	flag.Parse()
 
 	if *flagVersion {
 		fmt.Println(version)
