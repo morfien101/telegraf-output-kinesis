@@ -46,6 +46,12 @@ type Config struct {
 	WavefrontUseStrict bool `tom:"wavefront_use_strict"`
 }
 
+// New will return a clone Config that has the default data format of influx
+func New() *Config {
+	return &Config{DataFormat: "influx"}
+}
+
+// NewTelegrafConfig will return a serializer config that uses the config passed in to create it.
 func NewTelegrafConfig(clone *Config) *serializers.Config {
 	tc := &serializers.Config{
 		DataFormat:              clone.DataFormat,

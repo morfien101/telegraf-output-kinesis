@@ -1,8 +1,10 @@
 package kinesis
 
 import (
+	"os"
 	"testing"
 
+	"github.com/Flaque/filet"
 	"github.com/influxdata/telegraf/testutil"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
@@ -78,4 +80,33 @@ func TestConfigDecoding(t *testing.T) {
 		t.Fail()
 	}
 	t.Logf("Shard count: %d", ko.OverrideShardCount)
+}
+
+func TestConfigEnvVars(t *testing.T) {
+	defer filet.CleanUp(t)
+	expectStreamName := "TestStreamValue"
+
+	tmpContents := `
+region = "ap-southeast-2"
+streamname = "${TESTING_KINESIS_STREAM_NAME}"
+`
+	testingConfig := filet.TmpFile(t, "", tmpContents)
+
+	err := os.Setenv("TESTING_KINESIS_STREAM_NAME", expectStreamName)
+	if err != nil {
+		t.Logf("Couldn't set the testing Environment variable. Error: %s", err)
+		t.Fail()
+	}
+
+	ko, err := NewKinesisOutput(testingConfig.Name())
+
+	if err != nil {
+		t.Logf("Failed to make new Kinesis Output. Error: %s", err)
+		t.Fail()
+	}
+
+	if ko.StreamName != expectStreamName {
+		t.Logf("StreamName from Environment variable was not found. Want: %s, Got: %s", expectStreamName, ko.StreamName)
+		t.Fail()
+	}
 }

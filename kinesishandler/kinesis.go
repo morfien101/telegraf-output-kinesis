@@ -128,21 +128,28 @@ var sampleConfig = `
   debug = false
 `
 
+// SampleConfig will return a sample configuration that can be used.
 func SampleConfig() string {
 	return sampleConfig
 }
 
+// Description returns a short description of the plugin
 func Description() string {
 	return "Configuration for the AWS Kinesis output."
 }
 
+// NewKinesisOutput returns a Kinesis Output that is ready to connect and be used to
+// send data.
+// An error is also returned if something goes wrong.
 func NewKinesisOutput(configFilePath string) (*KinesisOutput, error) {
 	cfgBytes, err := ioutil.ReadFile(configFilePath)
 	if err != nil {
 		return nil, err
 	}
 
-	ko := &KinesisOutput{}
+	cfgBytes = parseConfig(cfgBytes)
+
+	ko := &KinesisOutput{Formatting: serializerclone.New()}
 	err = toml.Unmarshal(cfgBytes, ko)
 	if err != nil {
 		return nil, err
@@ -154,7 +161,8 @@ func NewKinesisOutput(configFilePath string) (*KinesisOutput, error) {
 		return nil, err
 	}
 
-	ko.SetSerializer(serializer)
+	ko.serializer = serializer
+
 	return ko, nil
 }
 
@@ -196,12 +204,9 @@ func (k *KinesisOutput) Connect() error {
 	return nil
 }
 
+// Close does nothing but is required by the telegraf plugin interface
 func (k *KinesisOutput) Close() error {
 	return nil
-}
-
-func (k *KinesisOutput) SetSerializer(serializer serializers.Serializer) {
-	k.serializer = serializer
 }
 
 func writekinesis(k *KinesisOutput, r []*kinesis.PutRecordsRequestEntry) time.Duration {
