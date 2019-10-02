@@ -43,8 +43,9 @@ will attempt to authenticate.
   streamname = "KinesisStreamName"
   aggregate_metrics = true
   content_encoding = "gzip"
+  debug = false
   partition = { method = "random" }
-  debug = true
+  formatting = { data_format = "json" }
 ```
 
 ## Using the plugin
@@ -60,7 +61,7 @@ Flag | Description
 
 ## Config
 
-## AWS Configration
+## AWS Configuration
 
 The following AWS configuration variables are available and map directly to the normal AWS settings. If you don't know what they are then you most likely don't need to touch them.
 
